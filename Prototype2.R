@@ -95,7 +95,7 @@ server <- function(input, output, session) {
       xlab("Service Request Type") +
       ylab("Total Requests") +
       labs(
-        title = "Total Service Requests in 2020"
+        title = "Service Request Status in 2020"
       )
   })
   
