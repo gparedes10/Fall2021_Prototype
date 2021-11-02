@@ -4,7 +4,6 @@ library(dplyr)
 library(ggplot2)
 library(plotly) #Interactive ggplots
 library(leaflet) #Maps
-library(mapbaltimore) #Get neighborhood outlines
 
 #Call Data. Only need to run it once for the app to work, hence it is located up here.
 source('Prototype_Data.R')
