@@ -5,8 +5,15 @@ library(ggplot2)
 library(plotly) #Interactive ggplots
 library(leaflet) #Maps
 
+
 #Call Data. Only need to run it once for the app to work, hence it is located up here.
 source('Prototype_Data.R')
+
+#map labels for neighborhood names
+labels <- sprintf(
+  "<strong>%s</strong>",
+  neighborhoods$name
+) %>% lapply(htmltools::HTML)
 
 #------------------------------------------------------------------
 # Define UI for application 
@@ -48,19 +55,17 @@ ui <- fluidPage(
   #--------------------------------------------
   # Status for each Service Request
   #-------------------------------------------
+      h1("Service Requests Map"),
+      leafletOutput("sr_map", width = "50%", height = "500px"),
+      
       h1("Service Requests Status"),
-  
       #Requests per neighborhood
       plotlyOutput("tota_requests"),
-  
       #Total Service Request Status graph
       plotlyOutput("sr_status"),
       
       h1("Service Requests Over Time"),
-      plotlyOutput("sr_over_time"),
-  
-      h1("Service Requests Map"),
-      leafletOutput("sr_map", width = "50%", height = "500px")
+      plotlyOutput("sr_over_time")
   
   #Practice reproducible text
   # textOutput("selected_var")
@@ -134,19 +139,37 @@ server <- function(input, output, session) {
       )
   })
   
-  pal <- colorFactor(c("navy"), domain = c("HCD-Sanitation Property"))
   
   #Service Requests Map
-  output$sr_map <- renderLeaflet({
-    leaflet(data()) %>%
-      #base map layer
-      setView(lng = -76.6122, lat = 39.2904, zoom = 12) %>%
-      addTiles() %>%
-      addCircleMarkers()
-    
-  })
+  # output$sr_map <- renderLeaflet({
+  #   leaflet(data()) %>%
+  #     #base map layer
+  #     #setView(lng = -76.6122, lat = 39.2904, zoom = 12) %>%
+  #     addTiles() %>%
+  #     addCircleMarkers()
+  # })
 
-  
+  output$sr_map <- renderLeaflet({
+    leaflet() %>%
+      addTiles() %>%
+      addPolygons(
+        data = neighborhoods,
+        color = "black",
+        weight = 1.5,
+        highlightOptions = highlightOptions(
+          weight = 5,
+          color = "black",
+          fillOpacity = 0.5
+        ),
+        label = labels,
+        labelOptions = labelOptions(
+          style = list("font-weight" = "normal"),
+          textsize = "15px",
+          direction = "auto"
+        )
+      ) %>%
+      addCircleMarkers(data = data())
+  })
   
   
 }

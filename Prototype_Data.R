@@ -1,4 +1,7 @@
 
+library(sf)
+library(lubridate) #date formatting
+
 #------------------------------------------------------------------
 #Filter 311 Dataset into the trash-related requests only
 #------------------------------------------------------------------
@@ -33,19 +36,15 @@ sr_311Data <- droplevels(sr_311Data)
 # closedate, and lastactivitydate give an error while trying to change format to date (possible NA values) -
 # character string is not in a standard unambiguous format
 
-library(lubridate) #date formatting
-
 sr_311Data$createddate <- date(sr_311Data$createddate)
 sr_311Data$statusdate <- date(sr_311Data$statusdate)
 sr_311Data$duedate <- date(sr_311Data$duedate)
 
 
 #------------------------------------------------------------------
-# Change srtype to factors
+# Neighborhood shapes and names
 #------------------------------------------------------------------
-
-#sr_311Data$srtype <- as.factor(sr_311Data$srtype)
-
+neighborhoods <- st_read("Neighborhoods.geojson")
 
 
 
