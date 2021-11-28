@@ -20,8 +20,6 @@ labels <- sprintf(
 #Use colorFactor(rainbow(10)) to test other colors
 factpal = colorFactor(hue_pal()(10), sr_311Data$srtype)
 
-my_centers <<- list()
-
 #------------------------------------------------------------------
 # Define UI for application 
 #------------------------------------------------------------------
@@ -103,6 +101,7 @@ server <- function(input, output, session) {
       filter(createddate >= input$daterange[1] & createddate <= input$daterange[2])
   })
   
+  
   ##############################################################################
   # DROP-DOWN MENUS
   ##############################################################################
@@ -113,8 +112,7 @@ server <- function(input, output, session) {
     
     updateSelectInput(session, "neighborhood_choice", choices = sort(unique(sr_311Data$neighborhood)))
     
-    # map_choice <- input$sr_map_shape_click
-    # SelectInput(session, "neighborhood_choice", selected = map_choice$id)
+    #updateSelectInput(session, "neighborhood_choice", selected = input$sr_map_shape_click)
   })
   
   ##############################################################################
@@ -139,6 +137,7 @@ server <- function(input, output, session) {
         label = labels, #adds neighborhood name label when hovered
         labelOptions = labelOptions(
           textsize = "14px"),
+        layerId = ~name, #Used to get the name of the neighborhood when clicking on the map
         group = "neighborhoodShapes") %>%
       
       addCircleMarkers( #adds layer with Service Requests markers
@@ -160,8 +159,8 @@ server <- function(input, output, session) {
   #leafletProxy makes it so that the map doesn't have to be redrawn whenever the user clicks on it.
   observeEvent(input$sr_map_shape_click, {
     click <- input$sr_map_shape_click
-    
-    leafletProxy("sr_map") %>% 
+
+    leafletProxy("sr_map") %>%
       setView(
         lng = click$lng,
         lat = click$lat,
