@@ -4,7 +4,7 @@ library(dplyr)
 library(ggplot2)
 library(plotly) #Interactive ggplots
 library(leaflet) #Maps
-
+library(scales) #Used to get the default ggplot color pallet
 
 #Call Data. Only need to run it once for the app to work, hence it is located up here.
 source('Prototype_Data.R')
@@ -14,6 +14,13 @@ labels <- sprintf(
   "<strong>%s</strong>",
   neighborhoods$name
 ) %>% lapply(htmltools::HTML)
+
+#make color pallet for service requests
+#use hue_pal()(10) to add the 10 base colors from ggplot to see the 10 colors use show_col(hue_pal()(10))
+#Use colorFactor(rainbow(10)) to test other colors
+factpal = colorFactor(hue_pal()(10), sr_311Data$srtype)
+
+my_centers <<- list()
 
 #------------------------------------------------------------------
 # Define UI for application 
@@ -56,7 +63,7 @@ ui <- fluidPage(
   # Status for each Service Request
   #-------------------------------------------
       h1("Service Requests Map"),
-      leafletOutput("sr_map", width = "50%", height = "500px"),
+      leafletOutput("sr_map", width = "90%", height = "600px"),
       
       h1("Service Requests Status"),
       #Requests per neighborhood
@@ -65,7 +72,9 @@ ui <- fluidPage(
       plotlyOutput("sr_status"),
       
       h1("Service Requests Over Time"),
-      plotlyOutput("sr_over_time")
+      plotlyOutput("sr_over_time"),
+      
+      #textOutput("coords")
   
   #Practice reproducible text
   # textOutput("selected_var")
@@ -80,13 +89,10 @@ ui <- fluidPage(
 # Define server logic
 #------------------------------------------------------------------
 server <- function(input, output, session) {
-
-
-  # output$selected_var <- renderText({
-  #   paste("Your selected Service Request is: ", input$service_request_choice)
-  #   
-  # })
     
+  ##############################################################################
+  # REACTIVE DATA 
+  ##############################################################################
   #Filter data based on user selection
   data <- reactive({
     req(input$service_request_choice, input$neighborhood_choice)
@@ -97,14 +103,76 @@ server <- function(input, output, session) {
       filter(createddate >= input$daterange[1] & createddate <= input$daterange[2])
   })
   
+  ##############################################################################
+  # DROP-DOWN MENUS
+  ##############################################################################
+  
   #Create drop-down menus automatically
   observe({
-    updateSelectInput(session, "service_request_choice", choices = unique(sr_311Data$srtype))
+    updateSelectInput(session, "service_request_choice", choices = sort(unique(sr_311Data$srtype)))
     
     updateSelectInput(session, "neighborhood_choice", choices = sort(unique(sr_311Data$neighborhood)))
+    
+    # map_choice <- input$sr_map_shape_click
+    # SelectInput(session, "neighborhood_choice", selected = map_choice$id)
   })
   
-
+  ##############################################################################
+  # LEAFLET MAP
+  ##############################################################################
+  
+  #Leaflet Map 
+  output$sr_map <- renderLeaflet({
+    leaflet() %>%
+      addTiles() %>% #adds the base map
+      
+      addPolygons( #adds the polygon layer for the neighborhoods
+        data = neighborhoods,
+        layerId = neighborhoods$fid,
+        color = "#444444", #polygon color
+        weight = 1.5,      #polygons' outline weight
+        opacity = 1,       #polygons' outline opacity
+        fillOpacity = 0.25, #polygon opacity
+        highlightOptions = highlightOptions(
+          color = "white",  #Highlights the neighborhood hovered
+          weight = 3, 
+          bringToFront = FALSE), #moves the neighborhood outline layer up
+        label = labels, #adds neighborhood name label when hovered
+        labelOptions = labelOptions(
+          textsize = "14px"),
+        group = "neighborhoodShapes") %>%
+      
+      addCircleMarkers( #adds layer with Service Requests markers
+        data = data(),
+        color = ~factpal(srtype), #change color for each type of request based on color pallet
+        stroke = FALSE,           #remove the outer line of the marker
+        fillOpacity = 0.75,       
+        popup = data()$srtype,    #adds popup when marker is clicked
+        group = "ServiceRequests") %>%    
+      
+      addLayersControl(
+        overlayGroups = c("ServiceRequests","neighborhoodShapes"),
+        options = layersControlOptions(collapsed = FALSE)) %>%
+      
+      addLegend(pal = factpal, values = data()$srtype, opacity = 1)
+  })
+  
+  #Map zooms into the neighborhood that the user clicks on
+  #leafletProxy makes it so that the map doesn't have to be redrawn whenever the user clicks on it.
+  observeEvent(input$sr_map_shape_click, {
+    click <- input$sr_map_shape_click
+    
+    leafletProxy("sr_map") %>% 
+      setView(
+        lng = click$lng,
+        lat = click$lat,
+        zoom = 15)
+  })
+  
+  ##############################################################################
+  # GRAPHS
+  ##############################################################################
+  
   #Service Request status based on user selection
   output$sr_status <- renderPlotly({
     g <- ggplot(data(), aes(x = srstatus, fill = srtype))
@@ -137,38 +205,6 @@ server <- function(input, output, session) {
       labs(
         title = " Total Service Requests Over Time in 2020"
       )
-  })
-  
-  
-  #Service Requests Map
-  # output$sr_map <- renderLeaflet({
-  #   leaflet(data()) %>%
-  #     #base map layer
-  #     #setView(lng = -76.6122, lat = 39.2904, zoom = 12) %>%
-  #     addTiles() %>%
-  #     addCircleMarkers()
-  # })
-
-  output$sr_map <- renderLeaflet({
-    leaflet() %>%
-      addTiles() %>%
-      addPolygons(
-        data = neighborhoods,
-        color = "black",
-        weight = 1.5,
-        highlightOptions = highlightOptions(
-          weight = 5,
-          color = "black",
-          fillOpacity = 0.5
-        ),
-        label = labels,
-        labelOptions = labelOptions(
-          style = list("font-weight" = "normal"),
-          textsize = "15px",
-          direction = "auto"
-        )
-      ) %>%
-      addCircleMarkers(data = data())
   })
   
   
