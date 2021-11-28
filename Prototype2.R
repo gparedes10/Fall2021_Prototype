@@ -205,7 +205,9 @@ server <- function(input, output, session) {
       )
   })
   
-  
+  # output$selected_var <- renderText({ 
+  #   paste("You have selected", input$var)
+  # })
 }
 
 
