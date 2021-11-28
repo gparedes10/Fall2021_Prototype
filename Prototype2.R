@@ -128,7 +128,6 @@ server <- function(input, output, session) {
       
       addPolygons( #adds the polygon layer for the neighborhoods
         data = neighborhoods,
-        layerId = neighborhoods$fid,
         color = "#444444", #polygon color
         weight = 1.5,      #polygons' outline weight
         opacity = 1,       #polygons' outline opacity
