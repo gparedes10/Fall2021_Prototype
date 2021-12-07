@@ -24,7 +24,6 @@ factpal = colorFactor(hue_pal()(10), sr_311Data$srtype)
 # Define UI for application 
 #------------------------------------------------------------------
 ui <- fluidPage(
-  
   # Application title
   titlePanel("Prototype Application - Reactive plots"),
   
@@ -72,7 +71,20 @@ ui <- fluidPage(
       h1("Service Requests Over Time"),
       plotlyOutput("sr_over_time"),
       
-      #textOutput("coords")
+      tags$div(class = "rendoText", list(
+        textOutput("selected_Neigh")
+        
+      )),
+  
+  #--------------------------------------------
+  # Table for Service Requests per Neighborhood
+  #-------------------------------------------
+      tableOutput("requestTable")
+  
+  
+  #Text for number of requests per neighborhood.
+  #uiOutput(outputId = "nums"),
+  
   
   #Practice reproducible text
   # textOutput("selected_var")
@@ -99,9 +111,11 @@ server <- function(input, output, session) {
       filter(srtype %in% input$service_request_choice) %>%
       filter(neighborhood %in% input$neighborhood_choice) %>%
       filter(createddate >= input$daterange[1] & createddate <= input$daterange[2])
+    
+    
   })
   
-  
+
   ##############################################################################
   # DROP-DOWN MENUS
   ##############################################################################
@@ -205,9 +219,34 @@ server <- function(input, output, session) {
       )
   })
   
+  ##############################################################################
+  # TABLE
+  ##############################################################################
+  
+  output$requestTable <- renderTable(
+    as.data.frame.matrix(table(data()$srtype, data()$neighborhood)), 
+    striped=TRUE, 
+    bordered = TRUE, 
+    rownames = TRUE
+  )
+  
   # output$selected_var <- renderText({ 
   #   paste("You have selected", input$var)
   # })
+  
+  ####Text for number of requests###
+  
+  # output$nums <- renderUI({
+  #   requests <- data()$srtype %>%
+  #     factor(levels = input$service_request_choice)
+  #   counts <- table(requests)
+  #   
+  #   HTML(paste("There are", counts, input$service_request_choice, "Service Requests in ---<br>"))
+  # })
+  
+
+  
+  
 }
 
 
