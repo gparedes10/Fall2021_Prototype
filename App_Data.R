@@ -5,7 +5,7 @@ library(lubridate) #date formatting
 #------------------------------------------------------------------
 #Filter 311 Dataset into the trash-related requests only
 #------------------------------------------------------------------
-sr_311Data <- read.csv("311_Customer_Service_Requests_2020.csv")
+sr_311Data <- read.csv("311Data.csv")
 
 # Request types filter
 request_types <- as.factor(

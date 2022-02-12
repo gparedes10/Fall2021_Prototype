@@ -5,9 +5,10 @@ library(ggplot2)
 library(plotly) #Interactive ggplots
 library(leaflet) #Maps
 library(scales) #Used to get the default ggplot color pallet
+library(rsconnect) #used to deploy app to shinnyapp.io
 
 #Call Data. Only need to run it once for the app to work, hence it is located up here.
-source('Prototype_Data.R')
+source('App_Data.R')
 
 #map labels for neighborhood names
 labels <- sprintf(
@@ -25,7 +26,7 @@ factpal = colorFactor(hue_pal()(10), sr_311Data$srtype)
 #------------------------------------------------------------------
 ui <- fluidPage(
   # Application title
-  titlePanel("Prototype Application - Reactive plots"),
+  titlePanel("Prototype Application - 311 Data"),
   
   sidebarLayout(
     
