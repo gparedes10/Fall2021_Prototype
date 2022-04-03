@@ -1,2 +1,4 @@
 # Fall_Semester_Prototype
- R Shiny prototype
+ Fall 2021 R Shiny prototype. 
+ The goal of this app is to create reactive plots for 311 Service Requests based on user's input.
+ The app has three settings that users can change: Request Type, Neighborhood, and Date. 
