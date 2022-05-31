@@ -1,4 +1,3 @@
-
 library(shiny)
 library(dplyr)
 library(ggplot2)
@@ -35,7 +34,7 @@ ui <- fluidPage(
       
       #Add Select Neighborhood Menu
       selectInput(inputId = "neighborhood_choice",
-                  label = "Choose a Neighboor",
+                  label = "Choose a Neighborhood",
                   "Names",
                   multiple = TRUE),
       

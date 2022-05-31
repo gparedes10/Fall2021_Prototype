@@ -1,0 +1,14 @@
+name: Fall_Semester_Prototype
+title: Fall_Semester_Prototype
+username:
+account: bdsc-311dataapp
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5824737
+bundleId: 5965650
+url: https://bdsc-311dataapp.shinyapps.io/Fall_Semester_Prototype/
+when: 1654040336.24064
+lastSyncTime: 1654040336.24065
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .gitattributes|README.md

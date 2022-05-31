@@ -1,11 +1,21 @@
 
 library(sf)
 library(lubridate) #date formatting
-
+library(dplyr)
 #------------------------------------------------------------------
 #Filter 311 Dataset into the trash-related requests only
 #------------------------------------------------------------------
 sr_311Data <- read.csv("311Data.csv")
+
+# sr_311Data <- select(sr_311Data,c(
+#                      "srtype",
+#                      "createddate",
+#                      "srstatus",
+#                      "statusdate",
+#                      "duedate",
+#                      "neighborhood",
+#                      "latitude",
+#                      "longitude"))
 
 # Request types filter
 request_types <- as.factor(
